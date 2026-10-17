@@ -37,9 +37,39 @@
   </main>
 </div>
 
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sName">
+  <div class="sh-top">
+    <div class="grabber"></div>
+    <div class="sh-head">
+      <span id="sIcon"></span>
+      <div class="sh-t"><b id="sName"></b><small id="sSub"></small></div>
+      <button class="close" id="sClose" aria-label="بستن">✕</button>
+    </div>
+  </div>
+  <div class="sh-body" id="sBody">
+    <div class="h-price" id="sPrice"></div>
+    <div class="h-change" id="sChange"></div>
+    <div class="chartbox tall"><svg class="chart" id="sChart" aria-label="نمودار قیمت"></svg></div>
+    <div class="seg" id="sSeg"></div>
+    <div class="sh-sec">جزئیات امروز</div>
+    <div class="stats" id="sStats">
+      <div class="bs"><span>خرید</span><b id="sBuy"></b></div><div class="bs"><span>فروش</span><b id="sSell"></b></div>
+      <div><span>بیشترین</span><b id="sHigh"></b></div><div><span>کمترین</span><b id="sLow"></b></div>
+    </div>
+    <div class="sh-sec">ماشین‌حساب</div>
+    <div class="conv">
+      <div class="conv-row"><input id="cA" inputmode="decimal" aria-label="مقدار"><span class="u" id="cAU"></span></div>
+      <div class="conv-row"><input id="cT" inputmode="decimal" aria-label="تومان"><span class="u">تومان</span></div>
+    </div>
+    <button class="alert-btn" id="sAlert" hidden>هشدار قیمت</button>
+  </div>
+</div>
+
 <script type="module">
   import { start } from './app.js';
   import './home.js';
+  import './sheet.js';
   start();
 </script>
 </body>

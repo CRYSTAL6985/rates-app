@@ -28,3 +28,10 @@ test('formatPrice shows ounces in dollars and toman as whole numbers', () => {
 test('formatPct is unsigned with a Persian percent sign', () => {
   assert.equal(formatPct(-1.55), '۱٫۵۵٪');
 });
+
+test('tomanPer converts dollar-priced ounces through the dollar rate', async () => {
+  const { tomanPer } = await import('../public/format.js');
+  assert.equal(tomanPer({ unit: 'toman' }, { price: 263800 }, { price: 263800 }), 263800);
+  assert.equal(tomanPer({ unit: 'usd' }, { price: 4000 }, { price: 250000 }), 1_000_000_000);
+  assert.ok(Number.isNaN(tomanPer({ unit: 'usd' }, { price: 4000 }, undefined)));
+});
