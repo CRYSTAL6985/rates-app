@@ -1,0 +1,10 @@
+{
+  "name": "rates-app",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test"
+  }
+}
