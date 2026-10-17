@@ -35,3 +35,9 @@ test('tomanPer converts dollar-priced ounces through the dollar rate', async () 
   assert.equal(tomanPer({ unit: 'usd' }, { price: 4000 }, { price: 250000 }), 1_000_000_000);
   assert.ok(Number.isNaN(tomanPer({ unit: 'usd' }, { price: 4000 }, undefined)));
 });
+
+test('alertLine describes the alert in Persian', async () => {
+  const { alertLine } = await import('../public/format.js');
+  assert.equal(alertLine({ unit: 'toman' }, { direction: 'above', target: 270000 }), 'بالاتر از ۲۷۰٬۰۰۰ تومان');
+  assert.equal(alertLine({ unit: 'usd' }, { direction: 'below', target: 4100.5 }), 'پایین‌تر از ۴٬۱۰۰٫۵ دلار');
+});
