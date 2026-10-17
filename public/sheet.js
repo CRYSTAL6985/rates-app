@@ -68,6 +68,8 @@ export function openSheet(id) {
   $('sClose').focus({ preventScroll: true });
 }
 
+export const currentItem = () => sheetKey;
+
 export function closeSheet(v = 0) {
   scrim.classList.remove('open');
   animateSheet(sheetH, v, { response: .4, damping: 1 }, () => { sheet.style.visibility = 'hidden'; sheetKey = null; screen.style.transform = ''; });

@@ -1,6 +1,29 @@
 import { resample, withLive } from './series.js';
 
 const REFRESH_MS = 60_000;
+
+// Alerts belong to this device. If storage is blocked, the id lasts only for this visit.
+function makeDeviceId() {
+  try {
+    let id = localStorage.getItem('device');
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem('device', id); }
+    return id;
+  } catch {
+    return crypto.randomUUID();
+  }
+}
+export const deviceId = makeDeviceId();
+
+// JSON call to our server. Returns the parsed body, or null for 204; throws on any error status.
+export async function api(method, path, body) {
+  const res = await fetch(path, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'X-Device': deviceId },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`${method} ${path}: ${res.status}`);
+  return res.status === 204 ? null : res.json();
+}
 const HISTORY_CACHE_MS = 5 * 60_000;
 
 export const state = { items: new Map(), quotes: new Map(), top: [], lastLoad: 0, online: true };
@@ -52,6 +75,7 @@ export async function getHistory(id, range) {
 export const series = async (id, range) => resample(withLive(await getHistory(id, range), state.quotes.get(id)));
 
 export function start() {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(err => console.warn('[sw]', err));
   setInterval(loadQuotes, REFRESH_MS);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loadQuotes(); });
   return loadQuotes();

@@ -36,3 +36,7 @@ export const jalaliToday = () =>
 // Toman value of one unit. Ounces are priced in dollars, so they go through the dollar rate.
 export const tomanPer = (item, quote, usdQuote) =>
   item.unit === 'usd' ? quote.price * (usdQuote?.price ?? NaN) : quote.price;
+
+const nfAny = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 });
+export const alertLine = (item, alert) =>
+  `${alert.direction === 'above' ? 'بالاتر از' : 'پایین‌تر از'} ${nfAny.format(alert.target)} ${item.unit === 'usd' ? 'دلار' : 'تومان'}`;

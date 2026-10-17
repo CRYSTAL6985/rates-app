@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>نرخ</title>
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preload" href="fonts/Vazirmatn.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,9 +23,11 @@
 
   <main class="col">
     <section class="large">
-      <h1>نرخ</h1>
+      <div class="title-row"><h1>نرخ</h1><button class="bell" id="bell" aria-label="هشدارهای قیمت"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-1.7 1.7a1 1 0 0 0 .7 1.7h16a1 1 0 0 0 .7-1.7Z"/></svg></button></div>
       <p class="sub"><span id="today"></span> · <span class="live" id="liveDot"></span><span id="ago">در حال دریافت…</span></p>
     </section>
+
+    <div id="fired"></div>
 
     <section class="hero card">
       <div class="hero-head">
@@ -62,14 +71,47 @@
       <div class="conv-row"><input id="cA" inputmode="decimal" aria-label="مقدار"><span class="u" id="cAU"></span></div>
       <div class="conv-row"><input id="cT" inputmode="decimal" aria-label="تومان"><span class="u">تومان</span></div>
     </div>
-    <button class="alert-btn" id="sAlert" hidden>هشدار قیمت</button>
+    <button class="alert-btn" id="sAlert">هشدار قیمت</button>
   </div>
 </div>
+
+<dialog class="panel" id="alertDlg" aria-labelledby="aName">
+  <div class="sh-head">
+    <span id="aIcon"></span>
+    <div class="sh-t"><b id="aName"></b><small>هشدار قیمت</small></div>
+    <button class="close" data-close aria-label="بستن">✕</button>
+  </div>
+  <form class="panel-body" id="aForm" method="dialog">
+    <div class="seg" id="aSeg"></div>
+    <div class="conv">
+      <div class="conv-row"><input id="aTarget" inputmode="decimal" aria-label="قیمت هدف" required><span class="u" id="aUnit"></span></div>
+    </div>
+    <p class="hint" id="aNow"></p>
+    <label class="switch-row">
+      <span><b>هر بار خبرم کن</b><small>خاموش: یک بار خبر می‌دهد و خاموش می‌شود</small></span>
+      <input type="checkbox" role="switch" id="aRepeat">
+    </label>
+    <p class="note" id="aNote" role="status"></p>
+    <button class="primary" id="aSave">ذخیره</button>
+    <button type="button" class="danger" id="aDelete" hidden>حذف هشدار</button>
+  </form>
+</dialog>
+
+<dialog class="panel" id="listDlg" aria-labelledby="lTitle">
+  <div class="sh-head">
+    <div class="sh-t"><b id="lTitle">هشدارهای قیمت</b></div>
+    <button class="close" data-close aria-label="بستن">✕</button>
+  </div>
+  <div class="panel-body"><div id="aList"></div></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script type="module">
   import { start } from './app.js';
   import './home.js';
   import './sheet.js';
+  import './alerts.js';
   start();
 </script>
 </body>
