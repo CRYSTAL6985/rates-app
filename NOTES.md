@@ -1,7 +1,7 @@
 # Rates app: brainstorm notes (2026-10-16)
 
 Working name: **نرخ** (placeholder; no final name yet).
-Status: **design conversation in progress, no app code written.** Resume from "Open question" below.
+Status: **v1 built 2026-10-17 on branch `feat/v1`** (see README.md, docs/specs, docs/plans). Remaining: real-phone push test without VPN, name and icon, hosting. The notes below are the original brainstorm.
 
 ## What it is
 

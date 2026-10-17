@@ -4,6 +4,8 @@ import { itemById } from './items.js';
 // The server POSTs to whatever endpoint a browser hands it, so only real push services are allowed.
 const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /\.push\.services\.mozilla\.com$/, /^web\.push\.apple\.com$/, /\.push\.apple\.com$/, /\.notify\.windows\.com$/];
 const GONE = new Set([404, 410]);
+// A push service that never answers must not hold up the next price check.
+const SEND_TIMEOUT_MS = 10_000;
 
 export function isPushEndpoint(endpoint) {
   let url;
@@ -24,7 +26,7 @@ export function createPush({ db, publicKey, privateKey, subject, log = console }
       const row = get.get(device);
       if (!row) return;
       try {
-        await webpush.sendNotification(JSON.parse(row.json), JSON.stringify(payload));
+        await webpush.sendNotification(JSON.parse(row.json), JSON.stringify(payload), { timeout: SEND_TIMEOUT_MS });
       } catch (err) {
         // The browser unsubscribed or the subscription expired.
         if (GONE.has(err.statusCode)) return drop.run(device);
