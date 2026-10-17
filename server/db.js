@@ -22,6 +22,10 @@ export function openDb(path = 'rates.db') {
       createdAt INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS alerts_device ON alerts (device);
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      device TEXT PRIMARY KEY,
+      json TEXT NOT NULL
+    );
   `);
   return db;
 }
