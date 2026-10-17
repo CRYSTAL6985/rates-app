@@ -32,7 +32,8 @@ export function parseNobitex(json, items, now = Date.now()) {
   return quotes;
 }
 
+// History symbols are IRT, so these prices are already in toman.
 export function parseNobitexHistory(json) {
   if (json?.s !== 'ok') return [];
-  return json.t.map((t, i) => ({ t: t * 1000, price: json.c[i] / RIAL_PER_TOMAN }));
+  return json.t.map((t, i) => ({ t: t * 1000, price: json.c[i] }));
 }

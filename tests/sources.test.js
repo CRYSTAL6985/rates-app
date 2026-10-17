@@ -71,11 +71,12 @@ test('tgju history returns oldest-first toman closes', () => {
   assert.equal(points.at(-1).price, num(json.data[0][3]) / 10);
 });
 
+// The history endpoint uses IRT (toman) symbols, unlike the rial stats endpoint.
 test('nobitex history returns oldest-first toman closes', () => {
   const json = fixture('nobitex-history.json');
   const points = parseNobitexHistory(json);
   assert.equal(points.length, json.t.length);
   assert.ok(points[0].t < points.at(-1).t);
-  assert.equal(points.at(-1).price, json.c.at(-1) / 10);
+  assert.equal(points.at(-1).price, json.c.at(-1));
   assert.deepEqual(parseNobitexHistory({ s: 'no_data' }), []);
 });

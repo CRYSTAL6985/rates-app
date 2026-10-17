@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>نرخ</title>
+<link rel="preload" href="fonts/Vazirmatn.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="screen" id="screen">
+  <header class="nav" id="nav">
+    <div class="bar"><span class="ctitle">نرخ</span></div>
+  </header>
+
+  <main class="col">
+    <section class="large">
+      <h1>نرخ</h1>
+      <p class="sub"><span id="today"></span> · <span class="live" id="liveDot"></span><span id="ago">در حال دریافت…</span></p>
+    </section>
+
+    <section class="hero card">
+      <div class="hero-head">
+        <div><div class="h-name" id="hName"></div><div class="h-unit" id="hUnit"></div></div>
+        <span id="hIcon"></span>
+      </div>
+      <div class="h-price" id="hPrice"></div>
+      <div class="h-change" id="hChange"></div>
+      <div class="chartbox"><svg class="chart" id="hChart" aria-label="نمودار قیمت"></svg></div>
+      <div class="seg" id="hSeg"></div>
+      <div class="top3" id="top3"></div>
+    </section>
+
+    <div class="segwrap" id="segwrap"><div class="seg" id="catSeg" role="tablist"></div></div>
+    <div class="listwrap" id="listwrap"><div id="list"></div><p class="foot" id="foot"></p></div>
+  </main>
+</div>
+
+<script type="module">
+  import { start } from './app.js';
+  import './home.js';
+  start();
+</script>
+</body>
+</html>

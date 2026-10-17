@@ -11,7 +11,7 @@ export const ITEMS = [
 
   { id: 'btc', tab: 'crypto', source: 'nobitex', key: 'btc', unit: 'toman', name: 'بیت‌کوین', short: 'بیت‌کوین', sub: 'BTC', sym: '₿', bg: '#f7931a' },
   { id: 'eth', tab: 'crypto', source: 'nobitex', key: 'eth', unit: 'toman', name: 'اتریوم', sub: 'ETH', sym: 'Ξ', bg: '#627eea' },
-  { id: 'usdt', tab: 'crypto', source: 'nobitex', key: 'usdt', unit: 'toman', name: 'تتر', sub: 'USDT', sym: '₮', bg: '#26a17b' },
+  { id: 'usdt', tab: 'crypto', source: 'nobitex', key: 'usdt', historySource: 'tgju', historyKey: 'crypto-tether-irr', unit: 'toman', name: 'تتر', sub: 'USDT', sym: '₮', bg: '#26a17b' },
   { id: 'doge', tab: 'crypto', source: 'nobitex', key: 'doge', unit: 'toman', name: 'دوج‌کوین', sub: 'DOGE', sym: 'Ð', bg: '#c2a633' },
   { id: 'sol', tab: 'crypto', source: 'nobitex', key: 'sol', unit: 'toman', name: 'سولانا', sub: 'SOL', sym: '◎', bg: 'linear-gradient(135deg,#9945ff,#14f195)' },
   { id: 'xrp', tab: 'crypto', source: 'nobitex', key: 'xrp', unit: 'toman', name: 'ریپل', sub: 'XRP', sym: '✕', bg: '#23292f' },
