@@ -41,7 +41,9 @@ test('junk payload does not crash the poller', async () => {
 test('a new source time records a snapshot, the same time does not', async () => {
   const db = openDb(':memory:');
   const tgju = fixture('tgju.json');
-  const fetchers = { tgju: ok(tgju), nobitex: ok({}) };
+  // Own timestamps: the fixture's real one falls out of the keep window as days pass.
+  const at = ts => ({ current: { ...tgju.current, price_dollar_rl: { ...tgju.current.price_dollar_rl, ts } } });
+  const fetchers = { tgju: ok(at('2030-01-01 09:00:00')), nobitex: ok({}) };
   const poller = createPoller({ db, fetchers, log: quiet });
   const count = () => db.prepare("SELECT count(*) AS n FROM snapshots WHERE id = 'usd'").get().n;
 
@@ -49,7 +51,7 @@ test('a new source time records a snapshot, the same time does not', async () =>
   await poller.poll();
   assert.equal(count(), 1);
 
-  fetchers.tgju = ok({ current: { ...tgju.current, price_dollar_rl: { ...tgju.current.price_dollar_rl, ts: '2030-01-01 10:00:00' } } });
+  fetchers.tgju = ok(at('2030-01-01 10:00:00'));
   await poller.poll();
   assert.equal(count(), 2);
 });
