@@ -40,6 +40,8 @@ export function createHistory({ db, fetchers = { tgju: fetchTgjuHistory, nobitex
       // Strictly after midnight, because tgju stamps a finished day's close at 00:00. The day's first tick
       // is dropped too: tgju opens gold on yesterday's price and moves to the real one seconds later.
       if (historySource(item) === 'tgju' && range === 'day') {
+        // Crypto (USDT) trades around the clock, so its day is the last 24 hours, like Nobitex's charts.
+        if (item.tab === 'crypto') return fromSnapshots.all(id, since).map(r => ({ t: r.t, price: r.price }));
         return fromSnapshots.all(id, tehranMidnight(now())).slice(1).map(r => ({ t: r.t, price: r.price }));
       }
       const key = `${id}:${range}`;
