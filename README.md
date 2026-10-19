@@ -84,22 +84,28 @@ The web app itself is unchanged; in the Android app it also copies favourites an
 into Android's storage (`public/native.js`) so the widgets and the alert check can read them.
 
 Build needs JDK 21 and the Android SDK in `~/Android/Sdk` (`ANDROID_HOME`, set in `~/.bashrc`).
-The server address is baked in when syncing, so use the PC's Wi-Fi address, not localhost:
+The server address is baked in when syncing. With the phone on a USB cable, `adb reverse` makes
+the phone's own port 3000 reach the PC, so the address never changes (the tether IP does, on every replug):
 
 ```bash
-npm start                                          # phone and PC on the same Wi-Fi
-NERKH_SERVER=http://192.168.1.5:3000 npm run android
+npm start
+adb reverse tcp:3000 tcp:3000                      # again after each replug
+NERKH_SERVER=http://127.0.0.1:3000 npm run android
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 cd android && ./gradlew testDebugUnitTest          # Kotlin tests
 ```
+
+Off the cable the app and widgets can't reach the PC: they keep the last prices. A hosted server fixes that.
 
 - **Widgets and alerts refresh every ~15 minutes** (Android's minimum), and right away when the app
   opens or favourites change. With no network they keep the last prices; the age turns red past 6 h.
 - **Alerts arrive up to ~15 minutes late.** The WebView has no web push, so the background round asks
   the server for this device's alerts and notifies each new `firedAt`. Nothing from Google needed.
-- **Downloads from Iran:** `dl.google.com` and Maven worked (2026-10-20); Gradle from GitHub crawled at
-  ~10 KB/s, so the wrapper zip came from `mirrors.cloud.tencent.com/gradle/` (checked against the
-  official SHA-256).
+- **Downloads from Iran:** Google's Maven randomly answers "not found", so `android/build.gradle` uses
+  Myket's mirror (`maven.myket.ir`) first. Gradle itself from GitHub crawled at ~10 KB/s; the wrapper
+  zip came from `mirrors.cloud.tencent.com/gradle/` (checked against the official SHA-256).
+- **Debugging the WebView:** debug builds expose Chrome DevTools: `adb forward tcp:9222
+  localabstract:webview_devtools_remote_$(adb shell pidof ir.nerkh.app)`, then open `chrome://inspect`.
 
 Before publishing (Cafe Bazaar / Myket): final app id, name and icon (`ir.nerkh.app` / نرخ are
 placeholders and permanent once published), an HTTPS server, and remove `cleartext: true` from
