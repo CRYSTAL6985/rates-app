@@ -1,0 +1,103 @@
+{
+ "items": [
+  {
+   "id": "usd",
+   "tab": "fx",
+   "source": "tgju",
+   "key": "price_dollar_rl",
+   "unit": "toman",
+   "name": "دلار آمریکا",
+   "short": "دلار",
+   "sub": "USD",
+   "flag": "🇺🇸"
+  },
+  {
+   "id": "usdt",
+   "tab": "crypto",
+   "source": "nobitex",
+   "key": "usdt",
+   "historySource": "tgju",
+   "historyKey": "crypto-tether-irr",
+   "unit": "toman",
+   "name": "تتر",
+   "sub": "USDT",
+   "sym": "₮",
+   "bg": "#26a17b"
+  },
+  {
+   "id": "g18",
+   "tab": "gold",
+   "source": "tgju",
+   "key": "geram18",
+   "unit": "toman",
+   "name": "طلای ۱۸ عیار",
+   "short": "طلا ۱۸",
+   "sub": "هر گرم",
+   "glyph": "۱۸",
+   "metal": "gold"
+  },
+  {
+   "id": "goz",
+   "tab": "gold",
+   "source": "tgju",
+   "key": "ons",
+   "unit": "usd",
+   "name": "انس طلا",
+   "sub": "بازار جهانی",
+   "glyph": "oz",
+   "metal": "gold"
+  }
+ ],
+ "quotes": [
+  {
+   "id": "usdt",
+   "price": 260705,
+   "change": -1261,
+   "changePct": -0.48,
+   "high": 263150,
+   "low": 260000,
+   "buy": 260705,
+   "sell": 260945,
+   "updatedAt": 1792444240200
+  },
+  {
+   "id": "usd",
+   "price": 263800,
+   "change": 1000,
+   "changePct": 0.38,
+   "high": 264800,
+   "low": 261800,
+   "buy": null,
+   "sell": null,
+   "updatedAt": 1792427395000
+  },
+  {
+   "id": "g18",
+   "price": 26177800,
+   "change": 240600,
+   "changePct": 0.93,
+   "high": 26283500,
+   "low": 25935400,
+   "buy": null,
+   "sell": null,
+   "updatedAt": 1792427393000
+  },
+  {
+   "id": "goz",
+   "price": 4139.28,
+   "change": -27.11,
+   "changePct": -0.65,
+   "high": 4188.99,
+   "low": 4137.62,
+   "buy": null,
+   "sell": null,
+   "updatedAt": 1792441038000
+  }
+ ],
+ "top": [
+  "g18",
+  "usd",
+  "usdt"
+ ],
+ "serverTime": 1792444248258
+}

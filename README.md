@@ -75,3 +75,32 @@ public/  ── the app: home.js, sheet.js, alerts.js, sw.js (offline shell + no
 2. On an Android phone, **without VPN**: open the site, install it, set an alert that will fire
    (dollar above 1), lock the phone, wait a minute.
 3. Write down whether the notification arrived. Repeat with VPN on.
+
+## Android app
+
+`android/` is a Capacitor 8 shell: a WebView that opens the نرخ server, plus native Kotlin for
+two home-screen widgets («قیمت‌های من» and a single price) and background alert notifications.
+The web app itself is unchanged; in the Android app it also copies favourites and its device id
+into Android's storage (`public/native.js`) so the widgets and the alert check can read them.
+
+Build needs JDK 21 and the Android SDK in `~/Android/Sdk` (`ANDROID_HOME`, set in `~/.bashrc`).
+The server address is baked in when syncing, so use the PC's Wi-Fi address, not localhost:
+
+```bash
+npm start                                          # phone and PC on the same Wi-Fi
+NERKH_SERVER=http://192.168.1.5:3000 npm run android
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+cd android && ./gradlew testDebugUnitTest          # Kotlin tests
+```
+
+- **Widgets and alerts refresh every ~15 minutes** (Android's minimum), and right away when the app
+  opens or favourites change. With no network they keep the last prices; the age turns red past 6 h.
+- **Alerts arrive up to ~15 minutes late.** The WebView has no web push, so the background round asks
+  the server for this device's alerts and notifies each new `firedAt`. Nothing from Google needed.
+- **Downloads from Iran:** `dl.google.com` and Maven worked (2026-10-20); Gradle from GitHub crawled at
+  ~10 KB/s, so the wrapper zip came from `mirrors.cloud.tencent.com/gradle/` (checked against the
+  official SHA-256).
+
+Before publishing (Cafe Bazaar / Myket): final app id, name and icon (`ir.nerkh.app` / نرخ are
+placeholders and permanent once published), an HTTPS server, and remove `cleartext: true` from
+`capacitor.config.ts`.

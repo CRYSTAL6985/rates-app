@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark tokens; the card matches the approved showcase. -->
+<resources>
+    <color name="widget_bg">#C71E1E22</color>
+    <color name="widget_label">#FFFFFF</color>
+    <color name="widget_label2">#99EBEBF5</color>
+    <color name="widget_sep">#12FFFFFF</color>
+    <color name="widget_up">#30D158</color>
+    <color name="widget_down">#FF453A</color>
+    <color name="widget_flat">#8E8E93</color>
+</resources>

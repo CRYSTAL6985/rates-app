@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget colours, from the app's tokens in public/styles.css (light). -->
+<resources>
+    <color name="widget_bg">#EBFFFFFF</color>
+    <color name="widget_label">#000000</color>
+    <color name="widget_label2">#993C3C43</color>
+    <color name="widget_sep">#293C3C43</color>
+    <color name="widget_up">#1F9D4C</color>
+    <color name="widget_down">#E5352B</color>
+    <color name="widget_flat">#8E8E93</color>
+</resources>
