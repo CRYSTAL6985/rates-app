@@ -43,3 +43,25 @@ test('usdt history comes from tgju, not nobitex', async () => {
   assert.deepEqual(asked, ['crypto-tether-irr']);
   assert.equal(points[0].price, 264051);
 });
+
+// The day chart is today's session only, so it never opens with yesterday's close.
+const daySnapshots = rows => {
+  const db = openDb(':memory:');
+  const add = db.prepare("INSERT INTO snapshots VALUES ('usd', ?, ?)");
+  for (const [ts, price] of rows) add.run(Date.parse(ts + '+03:30'), price);
+  return db;
+};
+
+test('tgju day chart is empty before the market opens', async () => {
+  const db = daySnapshots([['2026-10-18T19:00:00', 260000], ['2026-10-19T00:00:00', 262000]]);
+  const history = createHistory({ db, fetchers: {}, now: () => Date.parse('2026-10-19T09:00:00+03:30') });
+  assert.deepEqual(await history.get('usd', 'day'), []);
+});
+
+// tgju opens gold on yesterday's price and moves to the real one seconds later.
+test('tgju day chart starts at today\'s first real price, not yesterday\'s', async () => {
+  const db = daySnapshots([['2026-10-18T19:00:00', 260000], ['2026-10-19T00:00:00', 262000],
+    ['2026-10-19T10:00:08', 261900], ['2026-10-19T10:00:16', 255000], ['2026-10-19T11:00:00', 256000]]);
+  const history = createHistory({ db, fetchers: {}, now: () => Date.parse('2026-10-19T11:30:00+03:30') });
+  assert.deepEqual((await history.get('usd', 'day')).map(p => p.price), [255000, 256000]);
+});

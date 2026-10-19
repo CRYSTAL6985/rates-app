@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { ITEMS } from '../server/items.js';
-import { parseTgju, parseTgjuHistory } from '../server/sources/tgju.js';
+import { parseTgju, parseTgjuHistory, parseTgjuToday } from '../server/sources/tgju.js';
 import { parseNobitex, parseNobitexHistory } from '../server/sources/nobitex.js';
 
 const fixture = name => JSON.parse(readFileSync(new URL(`fixtures/${name}`, import.meta.url)));
@@ -79,4 +79,27 @@ test('nobitex history returns oldest-first toman closes', () => {
   assert.ok(points[0].t < points.at(-1).t);
   assert.equal(points.at(-1).price, json.c.at(-1));
   assert.deepEqual(parseNobitexHistory({ s: 'no_data' }), []);
+});
+
+// Rows are [price, "HH:MM:SS", change, change%], newest first, times in Tehran.
+const todayRows = { data: [['2,640,000', '11:30:00', '', ''], ['2,630,000', '10:05:00', '', '']] };
+const usdItem = ITEMS.find(i => i.id === 'usd');
+
+test('tgju today ticks become oldest-first toman points on the Tehran date', () => {
+  const now = Date.parse('2026-10-19T12:00:00+03:30');
+  assert.deepEqual(parseTgjuToday(todayRows, usdItem, now), [
+    { t: Date.parse('2026-10-19T10:05:00+03:30'), price: 263000 },
+    { t: Date.parse('2026-10-19T11:30:00+03:30'), price: 264000 },
+  ]);
+});
+
+test('tgju today ticks later than now belong to yesterday', () => {
+  const now = Date.parse('2026-10-20T00:10:00+03:30');
+  const points = parseTgjuToday({ data: [['2,640,000', '23:55:00', '', '']] }, usdItem, now);
+  assert.equal(points[0].t, Date.parse('2026-10-19T23:55:00+03:30'));
+});
+
+test('junk tgju today payload gives no points', () => {
+  assert.deepEqual(parseTgjuToday({ data: [['x', 'nope']] }, usdItem, Date.now()), []);
+  assert.deepEqual(parseTgjuToday('<html>', usdItem, Date.now()), []);
 });

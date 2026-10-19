@@ -50,7 +50,8 @@ export const chartColor = (svg, series) =>
 export function writeValue(item, quote, series, r, i, priceEl, changeEl) {
   if (i == null || !series.length) {
     priceEl.textContent = quote ? formatPrice(item, quote.price) : '—';
-    if (series.length < 2) { changeEl.innerHTML = '<span class="muted">هنوز نمودار کافی نیست</span>'; return; }
+    // No day chart means the market hasn't traded today: show the price alone.
+    if (series.length < 2) { changeEl.innerHTML = r === 0 ? '' : '<span class="muted">هنوز نمودار کافی نیست</span>'; return; }
     const first = series[0].price, diff = series.at(-1).price - first;
     changeEl.innerHTML = `<span class="${dirCls(diff)}">${arrow(diff)} ${formatPrice(item, Math.abs(diff))} (${formatPct(diff / first * 100)})</span> <span class="muted">${RANGE_TXT[r]}</span>`;
   } else {

@@ -50,9 +50,13 @@ public/  ── the app: home.js, sheet.js, alerts.js, sw.js (offline shell + no
   (BrsApi, navasan.tech). Each source sits behind one module in `server/sources/`.
 - **Nobitex blocks bursts** (Cloudflare 403), so history requests go one at a time, and USDT's
   chart comes from tgju because Nobitex refuses USDT history.
-- **Day charts for tgju items fill up over time.** tgju only gives daily history, so the day chart
-  is built from the server's own snapshots. A freshly started server shows "هنوز نمودار کافی نیست"
-  until it has seen the price change.
+- **Day charts for tgju items come from the server's own saved prices.** tgju's history is daily
+  only. On start the server also saves tgju's list of every change made *today*, so starting late
+  doesn't lose the morning; a day the server never ran is lost. The day
+  chart is today's (Tehran) session only: empty before the open, so the app shows just the price, and
+  never starting on yesterday's close, so the open isn't drawn as a cliff. After a day ends tgju
+  re-stamps its close as that day's 00:00; the poller ignores times older than the newest it has,
+  and the day chart starts strictly after midnight, so that stamp never shows.
 - **Notifications need HTTPS** (localhost is fine for testing on the same computer). On iPhone they
   work only after "Add to Home Screen", iOS 16.4+.
 - **Push inside Iran is not proven on a phone yet.** Google's push server accepted a test

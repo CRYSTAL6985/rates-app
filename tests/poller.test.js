@@ -68,3 +68,36 @@ test('poll hands the quotes to onQuotes', async () => {
   await poller.poll();
   assert.equal(seen, poller.quotes);
 });
+
+test('backfill saves today\'s tgju ticks for tgju items only', async () => {
+  const db = openDb(':memory:');
+  const asked = [];
+  const tgjuToday = async key => { asked.push(key); return { data: [['2,640,000', '10:05:00', '', '']] }; };
+  const poller = createPoller({ db, fetchers: { tgjuToday }, log: quiet });
+  await poller.backfill();
+  assert.ok(asked.includes('price_dollar_rl'));
+  assert.ok(!asked.includes('btc') && !asked.includes('crypto-tether-irr'));
+  assert.equal(db.prepare("SELECT price FROM snapshots WHERE id = 'usd'").get().price, 264000);
+});
+
+test('one failing backfill request does not stop the rest', async () => {
+  const db = openDb(':memory:');
+  let calls = 0;
+  const tgjuToday = async () => { if (++calls === 1) throw new Error('403'); return { data: [['2,640,000', '10:05:00', '', '']] }; };
+  const poller = createPoller({ db, fetchers: { tgjuToday }, log: quiet });
+  await poller.backfill();
+  assert.ok(db.prepare('SELECT count(*) AS n FROM snapshots').get().n > 1);
+});
+
+// After a day ends tgju re-stamps its close as that day's 00:00, which would land before the day's real prices.
+test('a source time older than the newest snapshot is not recorded', async () => {
+  const db = openDb(':memory:');
+  const tgju = fixture('tgju.json');
+  const at = ts => ok({ current: { price_dollar_rl: { ...tgju.current.price_dollar_rl, ts } } });
+  const fetchers = { tgju: at('2030-01-01 17:00:00'), nobitex: ok({}) };
+  const poller = createPoller({ db, fetchers, log: quiet });
+  await poller.poll();
+  fetchers.tgju = at('2030-01-01 00:00:00');
+  await poller.poll();
+  assert.deepEqual(db.prepare("SELECT t FROM snapshots WHERE id = 'usd'").all().map(r => r.t), [Date.parse('2030-01-01T17:00:00+03:30')]);
+});
