@@ -19,6 +19,6 @@ test('coins carry their gold weight', () => {
   assert.equal(itemById('gerami').weight, 1.011);
 });
 
-test('home board is gold, dollar and bitcoin', () => {
-  assert.deepEqual(TOP_IDS, ['g18', 'usd', 'btc']);
+test('home board defaults to gold, dollar and USDT', () => {
+  assert.deepEqual(TOP_IDS, ['g18', 'usd', 'usdt']);
 });

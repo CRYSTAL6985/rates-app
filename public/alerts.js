@@ -20,7 +20,7 @@ const store = {
 };
 
 let toastTimer = 0;
-function toast(text) {
+export function toast(text) {
   const el = $('toast');
   el.textContent = text; el.hidden = false;
   clearTimeout(toastTimer);

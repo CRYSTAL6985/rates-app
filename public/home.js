@@ -4,6 +4,8 @@ import { norm } from './series.js';
 import { spring, settle, flash } from './motion.js';
 import { formatPrice, formatPct, nf, ago, jalaliToday } from './format.js';
 import { RANGES, RANGE_KEYS, dirCls, arrow, unitText, iconHTML, subText, agoHTML, chartColor, writeValue } from './ui.js';
+import { loadFavs, saveFavs, toggleFav } from './favs.js';
+import { toast } from './alerts.js';
 
 const $ = id => document.getElementById(id);
 const CATS = [
@@ -18,7 +20,7 @@ const SPARK_W = 46, SPARK_H = 24;
 const openItem = id => bus.dispatchEvent(new CustomEvent('open', { detail: id }));
 
 // ---------- hero ----------
-let heroKey = 'g18', heroRange = 0, heroSeries = [];
+let heroKey = null, heroRange = 0, heroSeries = [];
 const heroSvg = $('hChart');
 const heroChart = Chart(heroSvg, heroSvg.getBoundingClientRect().width || 326, 140,
   i => writeValue(state.items.get(heroKey), state.quotes.get(heroKey), heroSeries, heroRange, i, $('hPrice'), $('hChange')));
@@ -41,16 +43,49 @@ async function renderHero(animate) {
 Seg($('hSeg'), RANGES, i => { heroRange = i; renderHero(true); });
 
 function chipInner(item, q) {
-  return `<span class="c-top">${iconHTML(item, 'sm')}<span>${item.short}</span></span><b class="c-price">${q ? formatPrice(item, q.price, true) : '—'}</b><span class="c-ch ${dirCls(q?.changePct)}">${arrow(q?.changePct)} ${q ? formatPct(q.changePct) : ''}</span>`;
+  return `<span class="c-top">${iconHTML(item, 'sm')}<span class="c-name">${item.short ?? item.name}</span></span><b class="c-price">${q ? formatPrice(item, q.price, true) : '—'}</b><span class="c-ch ${dirCls(q?.changePct)}">${arrow(q?.changePct)} ${q ? formatPct(q.changePct) : ''}</span>`;
 }
 function renderChips() {
-  $('top3').innerHTML = state.top.map(k => `<button class="chip" data-chip="${k}" aria-pressed="${k === heroKey}">${chipInner(state.items.get(k), state.quotes.get(k))}</button>`).join('');
+  $('top3').innerHTML = favs.map(k => `<button class="chip" data-chip="${k}" aria-pressed="${k === heroKey}">${chipInner(state.items.get(k), state.quotes.get(k))}</button>`).join('')
+    + '<button class="chip add" aria-label="افزودن قیمت">+ افزودن</button>';
 }
 $('top3').addEventListener('click', e => {
+  if (e.target.closest('.add')) { renderFavPanel(); $('favDlg').showModal(); return; }
   const b = e.target.closest('.chip'); if (!b || b.dataset.chip === heroKey) return;
   heroKey = b.dataset.chip;
-  $('top3').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b));
+  $('top3').querySelectorAll('.chip[data-chip]').forEach(c => c.setAttribute('aria-pressed', c === b));
   renderHero(true); settle($('hPrice')); settle($('hName'));
+});
+
+// ---------- favourites ----------
+// The top row. Starred anywhere (list rows or the add panel), saved on this device only.
+let favs = [];
+const storage = () => { try { return localStorage; } catch { return null; } };
+const starHTML = (item, on) => `<button class="star" data-star="${item.id}" aria-pressed="${on}" aria-label="نشان کردن ${item.name}"></button>`;
+
+function toggleStar(id) {
+  const next = toggleFav(favs, id);
+  // The toast would sit under the open panel, so the panel says it itself.
+  const note = $('favDlg').open ? text => { $('favNote').textContent = text; } : toast;
+  if (next === favs) { note('دست‌کم یک قیمت باید بالای صفحه بماند.'); return; }
+  $('favNote').textContent = '';
+  favs = next;
+  saveFavs(storage(), favs);
+  document.querySelectorAll(`[data-star="${id}"]`).forEach(b => b.setAttribute('aria-pressed', favs.includes(id)));
+  if (!favs.includes(heroKey)) { heroKey = favs[0]; renderHero(true); }
+  renderChips();
+}
+
+function renderFavPanel() {
+  $('favNote').textContent = '';
+  $('favList').innerHTML = CATS.map(c => {
+    const rows = [...state.items.values()].filter(i => i.tab === c.tab).map(item =>
+      `<button class="frow" data-star="${item.id}" aria-pressed="${favs.includes(item.id)}">${iconHTML(item, 'sm')}<span class="f-name">${item.name}</span><span class="star" aria-hidden="true"></span></button>`);
+    return `<div class="f-sec">${c.label}</div><div class="fgroup">${rows.join('')}</div>`;
+  }).join('');
+}
+$('favList').addEventListener('click', e => {
+  const b = e.target.closest('[data-star]'); if (b) toggleStar(b.dataset.star);
 });
 
 // ---------- list ----------
@@ -68,7 +103,7 @@ const smallHTML = (item, q) => {
 
 function rowHTML(id) {
   const item = state.items.get(id), q = state.quotes.get(id), c = dirCls(q?.changePct);
-  return `<div class="row" role="button" tabindex="0" data-key="${id}">${iconHTML(item)}
+  return `<div class="row" role="button" tabindex="0" data-key="${id}">${starHTML(item, favs.includes(id))}${iconHTML(item)}
     <span class="nm"><b>${item.name}</b><small>${smallHTML(item, q)}</small></span>
     <svg class="spark ${c}" viewBox="0 0 ${SPARK_W} ${SPARK_H}" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
     <span class="pr"><b class="price">${q ? formatPrice(item, q.price, true) : '—'}</b><span class="pill ${c}" data-pill="${id}">${pillText(item, q)}</span></span></div>`;
@@ -95,6 +130,8 @@ Seg($('catSeg'), CATS.map(c => c.label), (i, prev) => {
   listSp = spring({ from: 0, to: 1, response: .38, damping: 1, onUpdate: t => { lw.style.transform = `translateX(${start * (1 - t)}px)`; lw.style.opacity = Math.min(1, .15 + t); } });
 });
 $('list').addEventListener('click', e => {
+  const star = e.target.closest('[data-star]');
+  if (star) { toggleStar(star.dataset.star); return; }
   if (e.target.closest('.pill')) {
     pillMode = pillMode === 'pct' ? 'toman' : 'pct';
     document.querySelectorAll('[data-pill]').forEach(p => p.textContent = pillText(state.items.get(p.dataset.pill), state.quotes.get(p.dataset.pill)));
@@ -104,7 +141,8 @@ $('list').addEventListener('click', e => {
 });
 $('list').addEventListener('keydown', e => {
   const row = e.target.closest('.row');
-  if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openItem(row.dataset.key); }
+  // Only the row itself: Enter on its star button must not also open the sheet.
+  if (row && e.target === row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openItem(row.dataset.key); }
 });
 
 function updateRow(id, dir) {
@@ -140,6 +178,8 @@ let first = true;
 bus.addEventListener('quotes', e => {
   if (first) {
     first = false;
+    favs = loadFavs(storage(), state.top, new Set(state.items.keys()));
+    heroKey = favs[0];
     renderChips(); renderList(); renderHero(false); renderStatus();
     return;
   }

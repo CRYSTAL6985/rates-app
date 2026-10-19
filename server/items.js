@@ -31,7 +31,7 @@ export const ITEMS = [
   { id: 'soz', tab: 'silver', source: 'tgju', key: 'silver', unit: 'usd', name: 'انس نقره', sub: 'بازار جهانی', glyph: 'oz', metal: 'silver' },
 ];
 
-export const TOP_IDS = ['g18', 'usd', 'btc'];
+export const TOP_IDS = ['g18', 'usd', 'usdt'];
 
 const byId = new Map(ITEMS.map(i => [i.id, i]));
 export const itemById = id => byId.get(id);

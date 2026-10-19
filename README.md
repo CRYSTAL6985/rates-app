@@ -57,6 +57,9 @@ public/  ── the app: home.js, sheet.js, alerts.js, sw.js (offline shell + no
   never starting on yesterday's close, so the open isn't drawn as a cliff. After a day ends tgju
   re-stamps its close as that day's 00:00; the poller ignores times older than the newest it has,
   and the day chart starts strictly after midnight, so that stamp never shows.
+- **The top tiles are each visitor's own.** A first visit shows `TOP_IDS` (18k gold, dollar, USDT);
+  starring any price adds a tile and un-starring removes one, defaults included, but never the last.
+  The list lives in that browser's localStorage (`public/favs.js`), so it isn't shared between devices.
 - **Notifications need HTTPS** (localhost is fine for testing on the same computer). On iPhone they
   work only after "Add to Home Screen", iOS 16.4+.
 - **Push inside Iran is not proven on a phone yet.** Google's push server accepted a test
