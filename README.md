@@ -60,6 +60,9 @@ public/  ── the app: home.js, sheet.js, alerts.js, sw.js (offline shell + no
 - **The top tiles are each visitor's own.** A first visit shows `TOP_IDS` (18k gold, dollar, USDT);
   starring any price adds a tile and un-starring removes one, defaults included, but never the last.
   The list lives in that browser's localStorage (`public/favs.js`), so it isn't shared between devices.
+- **The money in the background** (`public/img/*.webp`) was generated with Figma AI (file "نرخ – 3D
+  background objects") and cut out of its backdrop by script. They tilt and drift but never turn
+  fully, because they're flat images. `--x` places them for phones, `--xd` for screens 900px and wider.
 - **Notifications need HTTPS** (localhost is fine for testing on the same computer). On iPhone they
   work only after "Add to Home Screen", iOS 16.4+.
 - **Push inside Iran is not proven on a phone yet.** Google's push server accepted a test

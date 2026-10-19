@@ -12,6 +12,7 @@ const TYPES = {
   '.json': 'application/json',
   '.webmanifest': 'application/manifest+json',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
 };
 // Coins are 900/1000 gold; 18k gold is 750/1000.

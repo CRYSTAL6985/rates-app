@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import http from 'node:http';
@@ -27,6 +27,8 @@ before(async () => {
   });
   const publicDir = mkdtempSync(join(tmpdir(), 'rates-public-'));
   writeFileSync(join(publicDir, 'index.html'), '<!doctype html><title>نرخ</title>');
+  mkdirSync(join(publicDir, 'img'));
+  writeFileSync(join(publicDir, 'img', 'btc.webp'), 'RIFF');
   server = createApp({ poller, history, publicDir, log: quiet });
   await new Promise(r => server.listen(0, r));
   base = `http://127.0.0.1:${server.address().port}`;
@@ -89,6 +91,12 @@ test('static files are served and unknown paths are 404', async () => {
   assert.equal(res.status, 200);
   assert.match(res.headers.get('content-type'), /text\/html/);
   assert.equal((await fetch(`${base}/nope.js`)).status, 404);
+});
+
+test('background images are served as webp', async () => {
+  const res = await fetch(`${base}/img/btc.webp`);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('content-type'), 'image/webp');
 });
 
 test('static path traversal is refused', async () => {

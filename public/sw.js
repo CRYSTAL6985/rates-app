@@ -1,9 +1,10 @@
 // Bump when the app shell changes, so old caches are dropped.
-const CACHE = 'nerkh-v1';
+const CACHE = 'nerkh-v6';
 const SHELL = [
   '/', '/styles.css', '/manifest.webmanifest',
-  '/app.js', '/home.js', '/sheet.js', '/alerts.js', '/chart.js', '/series.js', '/motion.js', '/format.js', '/ui.js',
+  '/app.js', '/home.js', '/sheet.js', '/alerts.js', '/chart.js', '/series.js', '/motion.js', '/format.js', '/ui.js', '/favs.js',
   '/fonts/Vazirmatn.woff2', '/icons/icon-192.png',
+  '/img/btc.webp', '/img/usdt.webp', '/img/gold.webp', '/img/eur.webp', '/img/usd.webp',
 ];
 
 self.addEventListener('install', e => {
