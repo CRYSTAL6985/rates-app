@@ -12,7 +12,8 @@ let sheetKey = null, sheetRange = 0, sheetSeries = [], sheetY = 0, sheetH = 0, s
 const item = () => state.items.get(sheetKey);
 const quote = () => state.quotes.get(sheetKey);
 const sheetSvg = $('sChart');
-const sheetChart = Chart(sheetSvg, Math.min(innerWidth, 560) - 32, 170,
+// Android's WebView can run this before layout, when innerWidth is still 0.
+const sheetChart = Chart(sheetSvg, Math.min(innerWidth || window.screen.width, 560) - 32, 170,
   i => writeValue(item(), quote(), sheetSeries, sheetRange, i, $('sPrice'), $('sChange')));
 const sheetSeg = Seg($('sSeg'), RANGES, i => { sheetRange = i; renderChart(true); });
 
