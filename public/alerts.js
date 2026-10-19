@@ -3,6 +3,7 @@ import { Seg } from './chart.js';
 import { currentItem } from './sheet.js';
 import { formatPrice, parseNum, nf, alertLine, ago } from './format.js';
 import { iconHTML, unitText } from './ui.js';
+import { isNative, androidNotifications } from './native.js';
 
 const $ = id => document.getElementById(id);
 const DIRECTIONS = ['above', 'below'];
@@ -41,6 +42,8 @@ function keyBytes(base64url) {
 
 // Returns a message for the user when notifications can't be turned on, or null when they are.
 async function enablePush() {
+  // The Android app checks alerts itself, so it only needs permission to show notifications.
+  if (isNative()) return androidNotifications();
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
     return isIOS && !standalone
       ? 'برای گرفتن اعلان، اول «نرخ» را به صفحهٔ اصلی اضافه کنید: دکمهٔ Share ← Add to Home Screen.'

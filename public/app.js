@@ -1,4 +1,5 @@
 import { resample, withLive } from './series.js';
+import { shareWithAndroid } from './native.js';
 
 const REFRESH_MS = 60_000;
 
@@ -13,6 +14,8 @@ function makeDeviceId() {
   }
 }
 export const deviceId = makeDeviceId();
+// The Android app checks this device's alerts in the background.
+shareWithAndroid('device', deviceId);
 
 // JSON call to our server. Returns the parsed body, or null for 204; throws on any error status.
 export async function api(method, path, body) {

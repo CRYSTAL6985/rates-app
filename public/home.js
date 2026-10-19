@@ -6,6 +6,7 @@ import { formatPrice, formatPct, nf, ago, jalaliToday } from './format.js';
 import { RANGES, RANGE_KEYS, dirCls, arrow, unitText, iconHTML, subText, agoHTML, chartColor, writeValue } from './ui.js';
 import { loadFavs, saveFavs, toggleFav } from './favs.js';
 import { toast } from './alerts.js';
+import { shareWithAndroid } from './native.js';
 
 const $ = id => document.getElementById(id);
 const CATS = [
@@ -71,6 +72,7 @@ function toggleStar(id) {
   $('favNote').textContent = '';
   favs = next;
   saveFavs(storage(), favs);
+  shareWithAndroid('favs', JSON.stringify(favs));
   document.querySelectorAll(`[data-star="${id}"]`).forEach(b => b.setAttribute('aria-pressed', favs.includes(id)));
   if (!favs.includes(heroKey)) { heroKey = favs[0]; renderHero(true); }
   renderChips();
@@ -180,6 +182,7 @@ bus.addEventListener('quotes', e => {
     first = false;
     favs = loadFavs(storage(), state.top, new Set(state.items.keys()));
     heroKey = favs[0];
+    shareWithAndroid('favs', JSON.stringify(favs));
     renderChips(); renderList(); renderHero(false); renderStatus();
     return;
   }
