@@ -25,6 +25,15 @@ Prices and alerts are stored in `rates.db` (SQLite, also not committed).
 | `PORT` | `3000` | Port to listen on |
 | `VAPID_PUBLIC`, `VAPID_PRIVATE` | made on first start | Push keys. Changing them breaks existing subscriptions |
 | `VAPID_SUBJECT` | `mailto:rates-app@example.com` | Contact for push services. Set a real `mailto:` before publishing |
+| `RATES_DB` | `rates.db` in the project | SQLite file. On a host, put it on a persistent disk (e.g. `/data/rates.db`) |
+
+### Hosting (Parspack PaaS)
+
+Node 24 template, port `3000`, public access on, one pod (SQLite can't be shared). Add a disk at
+`/data` and set `RATES_DB=/data/rates.db` before the first boot. Copy `VAPID_PUBLIC` and
+`VAPID_PRIVATE` from the local `.env` into the panel: without them each deploy makes new keys and
+every push subscription stops working. Then rebuild the Android app against the host:
+`NERKH_SERVER=https://<host> npm run android`.
 
 ## How it fits together
 

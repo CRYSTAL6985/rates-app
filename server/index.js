@@ -25,7 +25,8 @@ const PORT = Number(process.env.PORT) || 3000;
 // Push services want a way to contact the sender. Set VAPID_SUBJECT to a real mailto: before publishing.
 const subject = process.env.VAPID_SUBJECT || 'mailto:rates-app@example.com';
 
-const db = openDb(fileURLToPath(new URL('rates.db', root)));
+// On a host, point RATES_DB at a mounted disk: the container's own files are wiped on every deploy.
+const db = openDb(process.env.RATES_DB || fileURLToPath(new URL('rates.db', root)));
 const alerts = createAlertStore(db);
 const push = createPush({ db, publicKey: process.env.VAPID_PUBLIC, privateKey: process.env.VAPID_PRIVATE, subject });
 const poller = createPoller({ db, onQuotes: alertNotifier({ alerts, push }) });
