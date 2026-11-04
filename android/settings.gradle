@@ -3,3 +3,13 @@ include ':capacitor-cordova-android-plugins'
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
 
 apply from: 'capacitor.settings.gradle'
+// Iran: modules such as capacitor-android (in node_modules) declare their own
+// buildscript repositories, and Google's Maven 404s from here. Add mirrors to
+// every module's buildscript (moved from ~/.gradle/init.d on 2026-11-03).
+gradle.beforeProject { p ->
+    p.buildscript.repositories {
+        maven { url 'https://maven.myket.ir' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+}
