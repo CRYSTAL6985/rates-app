@@ -94,7 +94,9 @@ $('aForm').addEventListener('submit', async e => {
     else await api('POST', '/api/alerts', { item: form.item, ...body });
   } catch (err) {
     console.warn('[alerts]', err);
-    $('aNote').textContent = 'ذخیره نشد. اتصال را بررسی کنید و دوباره بزنید.';
+    $('aNote').textContent = err.status === 429
+      ? 'بیشتر از ۵۰ هشدار نمی‌شود. اول یکی را پاک کنید.'
+      : 'ذخیره نشد. اتصال را بررسی کنید و دوباره بزنید.';
     return;
   } finally {
     $('aSave').disabled = false;

@@ -20,6 +20,8 @@ const COIN_FINENESS_VS_18K = 900 / 750;
 
 const MAX_BODY = 1024;
 const MAX_TARGET = 1e15;
+// Device ids are made by the browser, so this caps what one id can add, not one person.
+const MAX_ALERTS_PER_DEVICE = 50;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 class BadRequest extends Error {}
@@ -106,6 +108,7 @@ export function createApp({ poller, history, alerts, push, publicDir, log = cons
     if (path === '/api/alerts' && req.method === 'POST') {
       const body = await readJson(req);
       if (!validAlert(body, ['item', 'direction', 'target', 'repeat'], ['item', 'direction', 'target'])) return sendJson(res, 400, { error: 'invalid alert' });
+      if (alerts.list(device).length >= MAX_ALERTS_PER_DEVICE) return sendJson(res, 429, { error: 'too many alerts' });
       return sendJson(res, 201, { alert: publicAlert(alerts.create(device, { repeat: false, ...body })) });
     }
     const one = path.match(/^\/api\/alerts\/([0-9a-f-]{1,64})$/);

@@ -24,7 +24,7 @@ export async function api(method, path, body) {
     headers: { 'Content-Type': 'application/json', 'X-Device': deviceId },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`${method} ${path}: ${res.status}`);
+  if (!res.ok) throw Object.assign(new Error(`${method} ${path}: ${res.status}`), { status: res.status });
   return res.status === 204 ? null : res.json();
 }
 const HISTORY_CACHE_MS = 5 * 60_000;

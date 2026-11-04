@@ -112,3 +112,10 @@ test('fired alert triggers a push to that device', async () => {
   assert.equal(sent[0][1].title, 'دلار آمریکا');
   assert.equal(sent[0][1].item, 'usd');
 });
+
+test('a device can keep at most 50 alerts', async () => {
+  const device = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+  for (let i = 0; i < 50; i++) assert.equal((await call('POST', '/api/alerts', { device, body: good })).status, 201);
+  assert.equal((await call('POST', '/api/alerts', { device, body: good })).status, 429);
+  assert.equal((await call('POST', '/api/alerts', { body: good })).status, 201);
+});

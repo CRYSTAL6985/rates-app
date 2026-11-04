@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { ITEMS, TOP_IDS, itemById } from '../server/items.js';
 
 test('every item has a unique id and a known tab', () => {
-  assert.equal(ITEMS.length, 25);
-  assert.equal(new Set(ITEMS.map(i => i.id)).size, 25);
+  assert.equal(ITEMS.length, 40);
+  assert.equal(new Set(ITEMS.map(i => i.id)).size, 40);
   for (const i of ITEMS) assert.ok(['fx', 'crypto', 'gold', 'silver'].includes(i.tab), i.id);
 });
 

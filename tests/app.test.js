@@ -41,7 +41,7 @@ const rawGet = path => new Promise((resolve, reject) => {
 
 test('GET /api/quotes returns items and quotes', async () => {
   const body = await (await fetch(`${base}/api/quotes`)).json();
-  assert.equal(body.items.length, 25);
+  assert.equal(body.items.length, 40);
   assert.deepEqual(body.top, ['g18', 'usd', 'usdt']);
   assert.ok(body.quotes.find(q => q.id === 'usd').price > 0);
   assert.ok(Number.isFinite(body.serverTime));
