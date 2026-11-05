@@ -78,7 +78,12 @@ export async function getHistory(id, range) {
 export const series = async (id, range) => resample(withLive(await getHistory(id, range), state.quotes.get(id)));
 
 export function start() {
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(err => console.warn('[sw]', err));
+  if ('serviceWorker' in navigator) {
+    // A deploy installs a new worker; reload once when it takes over so the update shows on this launch, not the next.
+    // Skipped on the very first visit (no old worker), where taking over changes nothing on screen.
+    if (navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
+    navigator.serviceWorker.register('/sw.js').catch(err => console.warn('[sw]', err));
+  }
   setInterval(loadQuotes, REFRESH_MS);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loadQuotes(); });
   return loadQuotes();

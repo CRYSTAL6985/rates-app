@@ -38,6 +38,11 @@ Node 24 template, port `3000`, public access on, one pod (SQLite can't be shared
 every push subscription stops working. Then rebuild the Android app against the host:
 `NERKH_SERVER=https://<host> npm run android`.
 
+**Updating:** pushing `main` redeploys by itself (GitHub webhook → Parspack, about a minute). The Android
+app and the iPhone home-screen app load their files from the server, so they pick up the new version the
+next time they're opened (the page reloads once when the new version arrives). Bump `CACHE` in
+`public/sw.js` with every change to `public/`. Only changes under `android/` need a new APK.
+
 ## How it fits together
 
 ```
