@@ -101,8 +101,8 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 .large{padding:0 16px 16px;margin-top:-8px}
 .title-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:10px}
-.mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#2a1c00;font-weight:900;font-size:21px;
-  background:linear-gradient(145deg,var(--gold-hi),var(--gold) 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 18px -6px var(--gold)}
+/* The app icon itself (design/logo); a hairline rim keeps the dark tile from melting into the dark nav. */
+.mark{width:40px;height:40px;border-radius:11px;flex:none;box-shadow:0 0 0 .5px rgba(255,255,255,.2),0 6px 18px -8px rgba(241,198,90,.6)}
 .large h1{font-size:32px;font-weight:900;line-height:1.15}
 .sub{font-size:13px;color:var(--label2);margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 22%,transparent);animation:pulse 2.4s ease-in-out infinite}

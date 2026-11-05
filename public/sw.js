@@ -1,5 +1,5 @@
 // Bump when the app shell changes, so old caches are dropped.
-const CACHE = 'nerkh-v13';
+const CACHE = 'nerkh-v14';
 const SHELL = [
   '/', '/styles.css', '/manifest.webmanifest',
   '/app.js', '/home.js', '/sheet.js', '/alerts.js', '/chart.js', '/series.js', '/motion.js', '/format.js', '/ui.js', '/favs.js', '/native.js', '/theme.js',
