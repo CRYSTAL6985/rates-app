@@ -3,7 +3,7 @@ import { Chart, Seg } from './chart.js';
 import { norm } from './series.js';
 import { spring, settle, flash } from './motion.js';
 import { formatPrice, formatPct, nf, ago, jalaliToday } from './format.js';
-import { RANGES, RANGE_KEYS, dirCls, arrow, unitText, iconHTML, subText, agoHTML, chartColor, writeValue } from './ui.js';
+import { RANGES, RANGE_KEYS, dirCls, arrow, unitText, iconHTML, subText, agoHTML, chartColor, writeValue, emptyChartText, matchItem } from './ui.js';
 import { loadFavs, saveFavs, toggleFav } from './favs.js';
 import { toast } from './alerts.js';
 import { shareWithAndroid } from './native.js';
@@ -36,6 +36,7 @@ async function renderHero(animate) {
   if (key !== heroKey || range !== heroRange) return;
   heroSeries = s;
   chartColor(heroSvg, s);
+  $('hBox').dataset.empty = emptyChartText(range, s.length);
   if (!heroChart.scrubbing) {
     heroChart.set(norm(s.map(p => p.price)), animate);
     writeValue(item, quote, s, range, null, $('hPrice'), $('hChange'));
@@ -62,7 +63,8 @@ $('top3').addEventListener('click', e => {
 // The top row. Starred anywhere (list rows or the add panel), saved on this device only.
 let favs = [];
 const storage = () => { try { return localStorage; } catch { return null; } };
-const starHTML = (item, on) => `<button class="star" data-star="${item.id}" aria-pressed="${on}" aria-label="نشان کردن ${item.name}"></button>`;
+const STAR_SVG = '<svg aria-hidden="true"><use href="#i-star"/></svg>';
+const starHTML = (item, on) => `<button class="star" data-star="${item.id}" aria-pressed="${on}" aria-label="نشان کردن ${item.name}">${STAR_SVG}</button>`;
 
 function toggleStar(id) {
   const next = toggleFav(favs, id);
@@ -82,7 +84,7 @@ function renderFavPanel() {
   $('favNote').textContent = '';
   $('favList').innerHTML = CATS.map(c => {
     const rows = [...state.items.values()].filter(i => i.tab === c.tab).map(item =>
-      `<button class="frow" data-star="${item.id}" aria-pressed="${favs.includes(item.id)}">${iconHTML(item, 'sm')}<span class="f-name">${item.name}</span><span class="star" aria-hidden="true"></span></button>`);
+      `<button class="frow" data-star="${item.id}" aria-pressed="${favs.includes(item.id)}">${iconHTML(item, 'sm')}<span class="f-name">${item.name}</span><span class="star" aria-hidden="true">${STAR_SVG}</span></button>`);
     return `<div class="f-sec">${c.label}</div><div class="fgroup">${rows.join('')}</div>`;
   }).join('');
 }
@@ -117,15 +119,52 @@ async function drawSpark(id) {
   if (line && s.length) line.setAttribute('points', sparkPts(s.map(p => p.price)));
 }
 
+// One glass group per category; while searching, every category with a match, under its own heading.
+const groupHTML = ids => `<div class="group glass">${ids.map(rowHTML).join('')}</div>`;
 function renderList() {
+  if (query !== null) return renderSearch();
   const c = CATS[cat], ids = [...state.items.values()].filter(i => i.tab === c.tab).map(i => i.id);
-  $('list').innerHTML = `<div class="group">${ids.map(rowHTML).join('')}</div>`;
+  $('list').innerHTML = groupHTML(ids);
   $('foot').textContent = c.foot || '';
   ids.forEach(drawSpark);
 }
+function renderSearch() {
+  const all = [...state.items.values()].filter(i => matchItem(i, query));
+  $('list').innerHTML = all.length
+    ? CATS.map(c => {
+      const ids = all.filter(i => i.tab === c.tab).map(i => i.id);
+      return ids.length ? `<p class="g-sec">${c.label}</p>${groupHTML(ids)}` : '';
+    }).join('')
+    : '<p class="empty">چیزی پیدا نشد.<br>نام فارسی یا کد لاتین را امتحان کنید، مثل «یورو» یا EUR.</p>';
+  $('foot').textContent = '';
+  all.forEach(i => drawSpark(i.id));
+}
+
+// ---------- search ----------
+// null = not searching (the tabs show); a string = searching, even when empty.
+let query = null;
+function openSearch() {
+  query = '';
+  $('catSeg').hidden = true; $('searchBox').hidden = false;
+  $('q').value = ''; $('q').focus();
+  // Bring the field to the top so the results have the room below it.
+  const top = $('segwrap').offsetTop - $('nav').offsetHeight;
+  if (screen.scrollTop < top) screen.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  renderList();
+}
+function closeSearch() {
+  query = null;
+  $('searchBox').hidden = true; $('catSeg').hidden = false;
+  catSeg.place();   // a resize while hidden measured it at zero width
+  renderList(); $('searchBtn').focus();
+}
+$('searchBtn').addEventListener('click', () => (query === null ? openSearch() : $('q').focus()));
+$('qCancel').addEventListener('click', closeSearch);
+$('q').addEventListener('input', e => { query = e.target.value; renderList(); });
+$('q').addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); if (e.key === 'Enter') e.target.blur(); });
 
 let listSp = null;
-Seg($('catSeg'), CATS.map(c => c.label), (i, prev) => {
+const catSeg = Seg($('catSeg'), CATS.map(c => c.label), (i, prev) => {
   cat = i; renderList();
   const start = -28 * Math.sign(i - prev), lw = $('listwrap');   // RTL: later tabs sit to the left, so content arrives from the left
   listSp && listSp.stop();
@@ -183,6 +222,7 @@ bus.addEventListener('quotes', e => {
     favs = loadFavs(storage(), state.top, new Set(state.items.keys()));
     heroKey = favs[0];
     shareWithAndroid('favs', JSON.stringify(favs));
+    document.body.classList.remove('loading');
     renderChips(); renderList(); renderHero(false); renderStatus();
     return;
   }

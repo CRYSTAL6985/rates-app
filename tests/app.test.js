@@ -8,6 +8,7 @@ import { openDb } from '../server/db.js';
 import { createPoller } from '../server/poller.js';
 import { createHistory } from '../server/history.js';
 import { createApp } from '../server/app.js';
+import { tehranMidnight } from '../server/sources/tgju.js';
 
 const fixture = name => JSON.parse(readFileSync(new URL(`fixtures/${name}`, import.meta.url)));
 const quiet = { error() {} };
@@ -65,7 +66,9 @@ test('GET /api/history rejects unknown range', async () => {
 test('day history for a tgju item comes from snapshots', async () => {
   const now = Date.now();
   db.prepare("DELETE FROM snapshots WHERE id = 'aed'").run();
-  for (const [i, p] of [1, 2, 3, 4].entries()) db.prepare("INSERT INTO snapshots VALUES ('aed', ?, ?)").run(now - (i + 1) * 60e3, p);
+  // Spread across today's session, so the test passes just after Tehran midnight too.
+  const midnight = tehranMidnight(now);
+  for (const [i, p] of [1, 2, 3, 4].entries()) db.prepare("INSERT INTO snapshots VALUES ('aed', ?, ?)").run(midnight + (now - midnight) * (i + 1) / 5, p);
   const { points } = await (await fetch(`${base}/api/history/aed?range=day`)).json();
   assert.equal(points.length, 3, 'the day\'s first tick is dropped');
   assert.ok(points[0].t < points[2].t);

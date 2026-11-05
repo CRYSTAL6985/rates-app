@@ -6,6 +6,9 @@ An installable web app (PWA) plus a small Node server.
 - Home: gold, dollar and bitcoin on one board, everything else in four tabs.
 - Tap any price: chart (day, week, month, year), buy/sell, day high/low, calculator, coin bubble.
 - Alerts: "tell me when the dollar goes above 270,000". Once, or every time it crosses.
+- Search: every price at once, by Persian name or Latin code («طلاي 18», «usd» both work).
+- Looks: liquid-glass surfaces over the 3D money, dark and light themes (button cycles auto → dark → light).
+  Glass turns solid with the system's "reduce transparency" setting; motion stops with "reduce motion".
 
 ## Run it
 

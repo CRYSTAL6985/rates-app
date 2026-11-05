@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>نرخ</title>
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eceef2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+<!-- Apply the saved theme before first paint, so a chosen light/dark never flashes the other one. -->
+<script>try{const t=localStorage.getItem('theme');if(t=='dark'||t=='light')document.documentElement.dataset.theme=t}catch{}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
@@ -15,14 +17,18 @@
 <link rel="preload" href="fonts/Vazirmatn.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<!-- Decorative: real renders of the money drifting behind the page. -->
+<body class="loading">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z"/></symbol>
+</svg>
+<!-- Decorative: real renders of the money held still behind the page. -->
 <div class="money" aria-hidden="true">
-  <img src="img/btc.webp" width="415" height="480" alt="" decoding="async" fetchpriority="low" style="--x:-8%;--xd:14%;--y:6%;--w:96px;--ry:18deg;--r:-12deg;--t:9s">
-  <img src="img/usdt.webp" width="408" height="480" alt="" decoding="async" fetchpriority="low" style="--x:74%;--xd:78%;--y:22%;--w:84px;--ry:16deg;--r:10deg;--t:11s;--far:1.5px;--o:.85;animation-delay:-2s">
-  <img src="img/usd.webp" width="560" height="338" alt="" decoding="async" fetchpriority="low" style="--x:-14%;--xd:6%;--y:45%;--w:150px;--ry:10deg;--r:14deg;--t:13s;--far:2.5px;--o:.7;animation-delay:-4s">
-  <img src="img/gold.webp" width="394" height="480" alt="" decoding="async" fetchpriority="low" style="--x:70%;--xd:72%;--y:64%;--w:104px;--ry:20deg;--r:-8deg;--t:10s;animation-delay:-6s">
-  <img src="img/eur.webp" width="416" height="480" alt="" decoding="async" fetchpriority="low" style="--x:-6%;--xd:16%;--y:84%;--w:70px;--ry:16deg;--r:6deg;--t:12s;--far:1px;--o:.9;animation-delay:-8s">
+  <img src="img/btc.webp" width="415" height="480" alt="" decoding="async" fetchpriority="low" style="--x:-8%;--xd:14%;--y:6%;--w:96px;--ry:18deg;--r:-12deg">
+  <img src="img/usdt.webp" width="408" height="480" alt="" decoding="async" fetchpriority="low" style="--x:74%;--xd:78%;--y:22%;--w:84px;--ry:16deg;--r:10deg;--o:.85">
+  <img src="img/usd.webp" width="560" height="338" alt="" decoding="async" fetchpriority="low" style="--x:-14%;--xd:6%;--y:45%;--w:150px;--ry:10deg;--r:14deg;--o:.7">
+  <img src="img/gold.webp" width="394" height="480" alt="" decoding="async" fetchpriority="low" style="--x:70%;--xd:72%;--y:64%;--w:104px;--ry:20deg;--r:-8deg">
+  <img src="img/eur.webp" width="416" height="480" alt="" decoding="async" fetchpriority="low" style="--x:-6%;--xd:16%;--y:84%;--w:70px;--ry:16deg;--r:6deg;--o:.9">
 </div>
 <div class="screen" id="screen">
   <header class="nav" id="nav">
@@ -31,26 +37,45 @@
 
   <main class="col">
     <section class="large">
-      <div class="title-row"><h1>نرخ</h1><button class="bell" id="bell" aria-label="هشدارهای قیمت"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-1.7 1.7a1 1 0 0 0 .7 1.7h16a1 1 0 0 0 .7-1.7Z"/></svg></button></div>
-      <p class="sub"><span id="today"></span> · <span class="live" id="liveDot"></span><span id="ago">در حال دریافت…</span></p>
+      <div class="title-row">
+        <div class="brand"><span class="mark" aria-hidden="true">ن</span><h1>نرخ</h1></div>
+        <div class="actions">
+          <button class="icon-btn glass thin" id="searchBtn" aria-label="جستجو"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+          <button class="icon-btn glass thin" id="themeBtn" aria-label="پوسته: خودکار"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+          <button class="icon-btn glass thin bell" id="bell" aria-label="هشدارهای قیمت"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg></button>
+        </div>
+      </div>
+      <p class="sub"><span id="today"></span><span aria-hidden="true">·</span><span class="live" id="liveDot"></span><span id="ago">در حال دریافت…</span></p>
     </section>
 
     <div id="fired"></div>
 
-    <section class="hero card">
+    <section class="hero glass">
       <div class="hero-head">
         <div><div class="h-name" id="hName"></div><div class="h-unit" id="hUnit"></div></div>
         <span id="hIcon"></span>
       </div>
       <div class="h-price" id="hPrice"></div>
       <div class="h-change" id="hChange"></div>
-      <div class="chartbox"><svg class="chart" id="hChart" aria-label="نمودار قیمت"></svg></div>
+      <div class="chartbox" id="hBox"><svg class="chart" id="hChart" aria-label="نمودار قیمت"></svg></div>
       <div class="seg" id="hSeg"></div>
       <div class="top3" id="top3"></div>
     </section>
 
-    <div class="segwrap" id="segwrap"><div class="seg" id="catSeg" role="tablist"></div></div>
-    <div class="listwrap" id="listwrap"><div id="list"></div><p class="foot" id="foot"></p></div>
+    <div class="segwrap" id="segwrap">
+      <div class="seg" id="catSeg" role="tablist" aria-label="دسته‌ها"></div>
+      <div class="search" id="searchBox" hidden>
+        <label class="field glass thin"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+          <input id="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="دلار، سکه، بیت‌کوین، USD…" aria-label="جستجوی قیمت"></label>
+        <button class="text-btn" id="qCancel">لغو</button>
+      </div>
+    </div>
+    <div class="listwrap" id="listwrap"><div id="list"><div class="group glass" aria-hidden="true">
+      <div class="row"><span class="ic sk"></span><span class="nm"><i class="sk" style="width:46%;height:14px"></i><i class="sk" style="width:24%;height:10px;margin-top:6px"></i></span><span class="pr"><i class="sk" style="width:80px;height:14px"></i><i class="sk" style="width:72px;height:18px;margin-top:6px"></i></span></div>
+      <div class="row"><span class="ic sk"></span><span class="nm"><i class="sk" style="width:38%;height:14px"></i><i class="sk" style="width:20%;height:10px;margin-top:6px"></i></span><span class="pr"><i class="sk" style="width:80px;height:14px"></i><i class="sk" style="width:72px;height:18px;margin-top:6px"></i></span></div>
+      <div class="row"><span class="ic sk"></span><span class="nm"><i class="sk" style="width:52%;height:14px"></i><i class="sk" style="width:22%;height:10px;margin-top:6px"></i></span><span class="pr"><i class="sk" style="width:80px;height:14px"></i><i class="sk" style="width:72px;height:18px;margin-top:6px"></i></span></div>
+      <div class="row"><span class="ic sk"></span><span class="nm"><i class="sk" style="width:42%;height:14px"></i><i class="sk" style="width:26%;height:10px;margin-top:6px"></i></span><span class="pr"><i class="sk" style="width:80px;height:14px"></i><i class="sk" style="width:72px;height:18px;margin-top:6px"></i></span></div>
+    </div></div><p class="foot" id="foot"></p></div>
   </main>
 </div>
 
@@ -61,25 +86,25 @@
     <div class="sh-head">
       <span id="sIcon"></span>
       <div class="sh-t"><b id="sName"></b><small id="sSub"></small></div>
-      <button class="close" id="sClose" aria-label="بستن">✕</button>
+      <button class="close" id="sClose" aria-label="بستن"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
   </div>
   <div class="sh-body" id="sBody">
     <div class="h-price" id="sPrice"></div>
     <div class="h-change" id="sChange"></div>
-    <div class="chartbox tall"><svg class="chart" id="sChart" aria-label="نمودار قیمت"></svg></div>
+    <div class="chartbox tall" id="sBox"><svg class="chart" id="sChart" aria-label="نمودار قیمت"></svg></div>
     <div class="seg" id="sSeg"></div>
     <div class="sh-sec">جزئیات امروز</div>
-    <div class="stats" id="sStats">
+    <div class="stats tile" id="sStats">
       <div class="bs"><span>خرید</span><b id="sBuy"></b></div><div class="bs"><span>فروش</span><b id="sSell"></b></div>
       <div><span>بیشترین</span><b id="sHigh"></b></div><div><span>کمترین</span><b id="sLow"></b></div>
     </div>
     <div class="sh-sec">ماشین‌حساب</div>
-    <div class="conv">
+    <div class="conv tile">
       <div class="conv-row"><input id="cA" inputmode="decimal" aria-label="مقدار"><span class="u" id="cAU"></span></div>
       <div class="conv-row"><input id="cT" inputmode="decimal" aria-label="تومان"><span class="u">تومان</span></div>
     </div>
-    <button class="alert-btn" id="sAlert">هشدار قیمت</button>
+    <button class="alert-btn" id="sAlert"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>هشدار قیمت</button>
   </div>
 </div>
 
@@ -87,11 +112,11 @@
   <div class="sh-head">
     <span id="aIcon"></span>
     <div class="sh-t"><b id="aName"></b><small>هشدار قیمت</small></div>
-    <button class="close" data-close aria-label="بستن">✕</button>
+    <button class="close" data-close aria-label="بستن"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <form class="panel-body" id="aForm" method="dialog">
     <div class="seg" id="aSeg"></div>
-    <div class="conv">
+    <div class="conv tile">
       <div class="conv-row"><input id="aTarget" inputmode="decimal" aria-label="قیمت هدف" required><span class="u" id="aUnit"></span></div>
     </div>
     <p class="hint" id="aNow"></p>
@@ -108,7 +133,7 @@
 <dialog class="panel" id="listDlg" aria-labelledby="lTitle">
   <div class="sh-head">
     <div class="sh-t"><b id="lTitle">هشدارهای قیمت</b></div>
-    <button class="close" data-close aria-label="بستن">✕</button>
+    <button class="close" data-close aria-label="بستن"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <div class="panel-body"><div id="aList"></div></div>
 </dialog>
@@ -116,18 +141,19 @@
 <dialog class="panel" id="favDlg" aria-labelledby="fTitle">
   <div class="sh-head">
     <div class="sh-t"><b id="fTitle">قیمت‌های من</b><small>ستاره بزنید تا بالای صفحه بیاید</small></div>
-    <button class="close" data-close aria-label="بستن">✕</button>
+    <button class="close" data-close aria-label="بستن"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <div class="panel-body"><p class="note" id="favNote" role="status"></p><div class="flist" id="favList"></div></div>
 </dialog>
 
-<div class="toast" id="toast" role="status" hidden></div>
+<div class="toast glass" id="toast" role="status" hidden></div>
 
 <script type="module">
   import { start } from './app.js';
   import './home.js';
   import './sheet.js';
   import './alerts.js';
+  import './theme.js';
   start();
 </script>
 </body>

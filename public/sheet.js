@@ -3,7 +3,7 @@ import { Chart, Seg } from './chart.js';
 import { norm } from './series.js';
 import { spring, project, rubber, flash } from './motion.js';
 import { formatPrice, parseNum, tomanPer, nf } from './format.js';
-import { RANGES, RANGE_KEYS, iconHTML, subText, chartColor, writeValue } from './ui.js';
+import { RANGES, RANGE_KEYS, iconHTML, subText, chartColor, writeValue, emptyChartText } from './ui.js';
 
 const $ = id => document.getElementById(id);
 const sheet = $('sheet'), scrim = $('scrim'), screen = $('screen'), sBody = $('sBody');
@@ -23,6 +23,7 @@ async function renderChart(animate) {
   if (key !== sheetKey || range !== sheetRange) return;
   sheetSeries = s;
   chartColor(sheetSvg, s);
+  $('sBox').dataset.empty = emptyChartText(range, s.length);
   if (sheetChart.scrubbing) return;
   sheetChart.set(norm(s.map(p => p.price)), animate);
   writeValue(item(), quote(), s, range, null, $('sPrice'), $('sChange'));
@@ -57,6 +58,7 @@ export function openSheet(id) {
   sheetSeries = [];
   writeValue(it, q, [], 0, null, $('sPrice'), $('sChange'));
   sheetChart.set([], false);
+  $('sBox').dataset.empty = '';
   renderChart(false);
   renderStats();
   $('cAU').textContent = it.tab === 'fx' || it.tab === 'crypto' ? it.sub : it.unit === 'usd' ? 'انس' : it.metal === 'coin' ? 'عدد' : 'گرم';
